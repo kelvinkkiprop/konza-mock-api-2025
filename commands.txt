@@ -1,0 +1,204 @@
+===============================================LARAVEL===============================================
+1. Installation
+composer create-project laravel/laravel konza-mock-api-2025
+
+2. Auth
+composer require laravel/ui
+php artisan ui bootstrap --auth
+npm install && npm run dev
+npm run dev
+npm run watch
+- For production
+npm run build
+
+3. Controllers
+php artisan make:controller Main/DashboardController
+php artisan make:controller Main/UserController --api --resource
+php artisan make:controller Main/ProjectController --api --resource
+
+
+4. Models
+php artisan make:model Main/Project -m
+php artisan make:model Other/ProjectStatus -m
+
+5. Seeder
+php artisan make:seeder UserSeeder
+php artisan make:seeder ProjectSeeder
+
+6. API Routes
+php artisan install:api
+
+6. Commands
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
+composer dump-autoload
+php artisan optimize:clear
+
+7. Middleware
+i. Create
+php artisan make:middleware AdminsOnly
+ii. Assigning Middleware To Routes: Within bootstrap\app.php class
+->withMiddleware(function (Middleware $middleware) {
+    // Add
+    $middleware->alias([
+        'adminonly'=>\App\Http\Middleware\AdminsOnly::class,
+    ]);
+})
+
+8. Mails
+php artisan make:mail SendEmail
+php artisan queue:listen
+php artisan queue:work
+===============================================./LARAVEL===============================================
+
+
+
+===============================================DEPLOY-TO-LINUX-SERVER===============================================
+1. Install Apache on Ubuntu
+-Open a terminal and run this command:
+$ sudo apt-get update
+$ sudo apt-get install apache2
+- Upgrade for latest software
+$ sudo apt-get upgrade
+
+2.Incase you Want to Remove Apache
+- First stop the apache2 service if it is running with:
+$ sudo service apache2 stop
+- Now remove and cleanup all the apache2 packages with:
+$ sudo apt-get purge apache2 apache2-utils apache2-bin apache2.2-common
+    OR
+$sudo apt-get purge apache2 apache2-utils apache2.2-bin apache2-common
+- Finally, run
+$ sudo apt-get autoremove
+- Two tests to confirm apache has been removed:
+$ which apache2 (should return a blank line)
+$ sudo service apache2 start (should return apache2: unrecognized service)
+
+-Verify Apache Installation
+Open a web browser and type in the address bar http://server_ip_address
+
+-Restart if not visible
+$ sudo systemctl stop apache2
+$ sudo systemctl start apache2
+$ sudo systemctl restart apache2
+$ sudo systemctl reload apache2
+
+2. Install Laravel
+-Go to
+$ cd /var/www/html
+-Clone a Git Repository
+
+- Give proper permissions to the project directory.
+$ sudo chgrp -R www-data /var/www/html/konza-mock-api-2025
+$ sudo chmod -R 775 /var/www/html/konza-mock-api-2025/storage
+$ sudo chmod -R 777 /var/www/html/konza-mock-api-2025
+
+-Install composer
+$ sudo apt-get install composer
+
+-Update ENV File and Generate An Encryption Key
+$ cp .env.example .env
+or
+$ touch .env
+$ composer update
+$ php artisan key:generate
+
+-  ERROR: the requested PHP extension dom is missing from your system.
+$ sudo apt-get install php-xml
+- Then composer install
+3 . Create a configuration file for our laravel project by typing the following commands
+
+$ sudo vim /etc/apache2/sites-available/laravel_kotda_smartpass.conf
+<VirtualHost *:80>
+        #ServerName 8.8.8.8
+        ServerName api.mock.konza.go.ke
+        ServerAdmin kkiprop@konza.go.ke
+        DocumentRoot /var/www/html/konza-mock-api-2025/public
+    <Directory /var/www/html/konza-mock-api-2025/public>
+        AllowOverride All
+    </Directory>
+
+    #ErrorLog ${APACHE_LOG_DIR}/error.log
+    #CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+4. Enable the newly created .conf file and disable the default .conf
+which is pre-created by apache and enable mode rewrite for this to function appropriately.
+
+$ sudo a2dissite 000-default.conf (disable the default .conf file)
+$ sudo a2ensite laravel_kotda_smartpass.conf (enables the newly created .conf file)
+$ sudo a2enmod rewrite (enables the rewrite)
+
+5. Restart Server
+$ sudo service apache2 restart
+===============================================./DEPLOY-TO-LINUX-SERVER===============================================
+
+
+
+===============================================SUPERVISOR===============================================
+1. Install
+- How to use supervisor to process jobs in Laravel in Linux Server
+$ sudo apt-get install supervisor
+$ sudo vi /etc/supervisor/conf.d/laravel-konza-mock-api-2025-worker.conf
+[program:laravel-konza-mock-api-2025-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=/usr/bin/php /var/www/html/konza-mock-api-2025/artisan queue:work database --sleep=3 --tries=3
+autostart=true
+autorestart=true
+user=root
+numprocs=5
+redirect_stderr=true
+stdout_logfile=/var/www/html/konza-mock-api-2025/storage/logs/worker.log
+
+2. Use
+- Press ESC
+- Then :wq
+$ sudo supervisorctl reread
+$ sudo supervisorctl update
+$ sudo supervisorctl start 'laravel-konza-mock-api-2025-worker:*'
+OR
+$ sudo supervisorctl start laravel-konza-mock-api-2025-worker.conf
+$ supervisorctl restart laravel-konza-mock-api-2025-worker:*
+
+-Check if supervisor is running
+$ ps aux | grep artisan
+
+supervisorctl commands
+sudo supervisorctl stop all
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start all
+
+Reference:
+https://laravel.com/docs/6.x/queues#supervisor-configuration
+
+3. Unistall
+- remove the package
+$ sudo apt-get remove supervisor
+- remove the package and all config
+$ sudo apt-get purge supervisor
+===============================================./SUPERVISOR===============================================
+
+
+
+===============================================SSL===============================================
+H. SSL in UBUNTU SERVER
+1.Install snapd
+sudo snap install core; sudo snap refresh core
+2.Remove certbot-auto and any Certbot OS packages
+sudo apt-get remove certbot, sudo dnf remove certbot, or sudo yum remove certbot
+3.Install Certbot
+sudo snap install --classic certbot
+4.Prepare the Certbot command
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+5. Choose how you'd like to run Certbot
+sudo certbot --apache
+OR
+sudo certbot certonly --apache
+6. Automatic reniwal
+sudo certbot renew --dry-run
+7.Reference
+https://certbot.eff.org/instructions?ws=apache&os=ubuntubionic
+===============================================./SSL===============================================
