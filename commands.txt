@@ -90,10 +90,19 @@ $ sudo systemctl reload apache2
 $ cd /var/www/html
 -Clone a Git Repository
 
+
+SSH
+ssh root@102.220.23.66
+composer install --ignore-platform-reqs
+
+
 - Give proper permissions to the project directory.
-$ sudo chgrp -R www-data /var/www/html/konza-mock-api-2025
-$ sudo chmod -R 775 /var/www/html/konza-mock-api-2025/storage
-$ sudo chmod -R 777 /var/www/html/konza-mock-api-2025
+sudo chgrp -R www-data /var/www/html/konza-mock-api-2025
+sudo chmod -R 775 /var/www/html/konza-mock-api-2025/storage
+sudo chmod -R 777 /var/www/html/konza-mock-api-2025
+sudo chown -R www-data:www-data database
+sudo chmod -R 775 database
+
 
 -Install composer
 $ sudo apt-get install composer
@@ -110,10 +119,11 @@ $ sudo apt-get install php-xml
 - Then composer install
 3 . Create a configuration file for our laravel project by typing the following commands
 
-$ sudo vim /etc/apache2/sites-available/laravel_kotda_smartpass.conf
+$ sudo vim /etc/apache2/sites-available/laravel_konza_mock_api_2025.conf
 <VirtualHost *:80>
         #ServerName 8.8.8.8
-        ServerName api.mock.konza.go.ke
+        ServerName api-mock.konza.go.ke
+        #ServerName api.mock.konza.go.ke
         ServerAdmin kkiprop@konza.go.ke
         DocumentRoot /var/www/html/konza-mock-api-2025/public
     <Directory /var/www/html/konza-mock-api-2025/public>
@@ -128,7 +138,7 @@ $ sudo vim /etc/apache2/sites-available/laravel_kotda_smartpass.conf
 which is pre-created by apache and enable mode rewrite for this to function appropriately.
 
 $ sudo a2dissite 000-default.conf (disable the default .conf file)
-$ sudo a2ensite laravel_kotda_smartpass.conf (enables the newly created .conf file)
+$ sudo a2ensite laravel_konza_mock_api_2025.conf (enables the newly created .conf file)
 $ sudo a2enmod rewrite (enables the rewrite)
 
 5. Restart Server
